@@ -1,0 +1,27 @@
+Etiquetes de producció
+
+**: X
+Article: 150
+Talla: X
+Quantitat: X Grups de: X
+**: X
+Color: X
+**: X
+**: X
+Imprimit(button)
+
+---
+
+Result:
+
+GTE: HOME
+Articulo: 150
+Talla Unica:
+
+Cantidad: 12
+
+331_Negre
+
+Perxat
+Rentat
+1
