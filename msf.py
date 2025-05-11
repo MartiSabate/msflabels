@@ -9,7 +9,7 @@ window = tkinter.Tk()
 # set window title
 window.title("Etiquetes de producció")
 # set window size 
-window.geometry("500x500") 
+#window.geometry("500x500") 
 
 
 # create frame inside the window (hiererchally)
@@ -92,21 +92,40 @@ def print_data(params):
     for i in range(iterations):
         #final output based on the iteration
         iteration_output = output + str(i+1) + "\n_____________________________________"
+
         if (i % 2) == 0:
             if i != 0:
                 y += 70 # adjust cursor y as corresponding per its iteration
-            # Left column
-            pdf.set_xy(left_x, y)
+                if i % 8 == 0:
+                    y -= 70
+                print(pdf.get_y())            
+                # Left column
+                pdf.set_xy(left_x, y)
+                pdf.multi_cell(100, 7, iteration_output)
+            else:
+                print(pdf.get_y())            
+                # Left column
+                pdf.set_xy(left_x, y)
+                pdf.multi_cell(100, 7, iteration_output)
         else:
             # Right column
             pdf.set_xy(right_x, y)
+            pdf.multi_cell(100, 7, iteration_output)
+            if pdf.get_y() == 287:  # A4 pages have a height of 297 mm, minus margins (~10mm top/bottom)
+                pdf.add_page()
+                y = 7  # Reset y to the top of the new page
         # print
-        pdf.multi_cell(100, 7, iteration_output, ln=True)
+        #pdf.multi_cell(100, 7, iteration_output)
+        # Check if y is getting close to the bottom of the page
     
+
+    # retrieve temporal os path
+    tmp_path = os.path.expandvars(r"%TMP%\pdf_1.pdf")
     #save pdf
-    pdf.output('pdf_1.pdf')
+    pdf.output(tmp_path)
     # print pdf
-    os.startfile("/home/mozzard/Documents/labels/pdf_1.pdf", "print")
+    #os.startfile(tmp_path, "print")
+    os.startfile(tmp_path)
     print("done")
 
 #validate_data function definition
@@ -146,8 +165,8 @@ def validate_data():
         param2 = "Articulo: " + param2entry.get()
         param3 = "Talla: " + param3entry.get()
         param4 = "Cantidad: " + param5entry.get()
-        param5 = "Color: " + param6entry.get() # preguntar que fer
-        param6 = "??1: " + param7entry.get()
+        param5 = "?'1: " + param6entry.get() # preguntar que fer
+        param6 = "Color: " + param7entry.get()
         param7 = "??2: " + param8entry.get()
         param8 = "??3: " + param9entry.get()
         param9 = int(param4entry.get())/int(param5entry.get())
