@@ -25,3 +25,7 @@ Cantidad: 12
 Perxat
 Rentat
 1
+
+pyinstaller --onefile --windowed --icon="C:\\Users\\mpinx\\Downloads\\msflabels\\msf.ico" .\msf.py
+
+--onefile means it won't need python installed in another computer

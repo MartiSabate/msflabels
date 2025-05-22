@@ -3,7 +3,6 @@ from fpdf import FPDF
 import os
 
 
-
 # parent window
 window = tkinter.Tk()
 # set window title
@@ -42,6 +41,11 @@ param8label.grid(row=6, column=0)
 param9label = tkinter.Label(frame1, text="**")
 param9label.grid(row=7, column=0)
 
+# default tkinter values
+
+rentar = tkinter.StringVar(value="RENTAR")
+unica = tkinter.StringVar(value="UNICA")
+
 
 # define and print text entry boxes
 
@@ -49,7 +53,7 @@ param1entry = tkinter.Entry(frame1)
 param1entry.grid(row=0, column=1)
 param2entry = tkinter.Entry(frame1)
 param2entry.grid(row=1, column=1)
-param3entry = tkinter.Entry(frame1)
+param3entry = tkinter.Entry(frame1, textvariable=unica)
 param3entry.grid(row=2, column=1)
 param4entry = tkinter.Entry(frame1)
 param4entry.grid(row=3, column=1)
@@ -59,7 +63,7 @@ param6entry = tkinter.Entry(frame1)
 param6entry.grid(row=4, column=1)
 param7entry = tkinter.Entry(frame1)
 param7entry.grid(row=5, column=1)
-param8entry = tkinter.Entry(frame1)
+param8entry = tkinter.Entry(frame1, textvariable=rentar)
 param8entry.grid(row=6, column=1)
 param9entry = tkinter.Entry(frame1)
 param9entry.grid(row=7, column=1)
@@ -70,6 +74,10 @@ param9entry.grid(row=7, column=1)
 #print_Data function definition
 
 def print_data(params):
+    #exctact last quantity value
+    lastQuantity = str(params[9])
+    lastOutput = ""
+    params.pop(-1)
     # define PDF
     pdf = FPDF('P', 'mm', 'A4')
     pdf.set_font('helvetica', '', 10)
@@ -88,11 +96,20 @@ def print_data(params):
     output = ""
     for values in params: #generate multi_cell value
         output += values + "\n"
+    
+    #generate last output string
+    params[3] = lastQuantity
+    for values in params: #generate multi_cell value
+        lastOutput += values + "\n"
     #print output on screen
     for i in range(iterations):
+        print("i value is: " + str(i))
+        print("range iterations values is: " + str(range(iterations)))
+        if i+1 == iterations:
+            output = lastOutput
         #final output based on the iteration
         iteration_output = output + str(i+1) + "\n_____________________________________"
-
+        
         if (i % 2) == 0:
             if i != 0:
                 y += 70 # adjust cursor y as corresponding per its iteration
@@ -164,15 +181,20 @@ def validate_data():
         param1 = "GTE: " + param1entry.get() # preguntar que fer
         param2 = "Articulo: " + param2entry.get()
         param3 = "Talla: " + param3entry.get()
-        param4 = "Cantidad: " + param5entry.get()
-        param5 = "?'1: " + param6entry.get() # preguntar que fer
+        #param4 = "Cantidad: " + param5entry.get()
+        param4 = "Cantidad: " + str(int(int(param4entry.get())/int(param5entry.get())))
+        param5 = "***: " + param6entry.get() # preguntar que fer
         param6 = "Color: " + param7entry.get()
-        param7 = "??2: " + param8entry.get()
-        param8 = "??3: " + param9entry.get()
-        param9 = int(param4entry.get())/int(param5entry.get())
+        param7 = "***: " + param8entry.get() # preguntar que fer
+        param8 = "***: " + param9entry.get() # preguntar que fer
+        param9 = param5entry.get() # quantitat / grups de
 
-        params = [param1, param2, param3, param4, param5, param6, param7, param8, param9]
+        #calculate modulus+quantity value as int
+        modulusQuantity = "Cantidad: " + str(int(param4entry.get())%int(param5entry.get())+int(int(param4entry.get())/int(param5entry.get())))
+        print("Modulus + quantitat = " + modulusQuantity)
+        params = [param1, param2, param3, param4, param5, param6, param7, param8, param9, modulusQuantity]
         print("Input validatin ok, printing")
+
         #after validation successfull print data
         print_data(params)
 
