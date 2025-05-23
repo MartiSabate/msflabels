@@ -132,7 +132,7 @@ def print_data(params, iters):
             # Right column
             pdf.set_xy(right_x, y)
             pdf.multi_cell(100, 7, iteration_output)
-            if pdf.get_y() == 264:  # A4 pages have a height of 297 mm, minus margins (~10mm top/bottom)
+            if pdf.get_y() == 271:  # A4 pages have a height of 297 mm, minus margins (~10mm top/bottom)
                 pdf.add_page()
                 y = 7  # Reset y to the top of the new page
         # print
@@ -186,7 +186,7 @@ def validate_data():
         # define output values
         param1 = param1entry.get() # preguntar que fer
         param2 = "Art " + param2entry.get()
-        param3 = "Talla " + param3entry.get() + "\n"
+        param3 = "Talla " + param3entry.get() + "\n\n"
         param4 = "Cnt " + param5entry.get()
         #param4 = "Cantidad: " + str(int(int(param4entry.get())/int(param5entry.get())))
         
