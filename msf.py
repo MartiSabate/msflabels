@@ -80,7 +80,7 @@ def print_data(params, iters):
     params.pop(-1)
     # define PDF
     pdf = FPDF('P', 'mm', 'A4')
-    pdf.set_font('helvetica', '', 20)
+    pdf.set_font('courier', '', 20)
     pdf.set_auto_page_break(auto=True, margin = 15)
     # add a page
     pdf.add_page()
@@ -132,7 +132,7 @@ def print_data(params, iters):
             # Right column
             pdf.set_xy(right_x, y)
             pdf.multi_cell(100, 7, iteration_output)
-            if pdf.get_y() == 257:  # A4 pages have a height of 297 mm, minus margins (~10mm top/bottom)
+            if pdf.get_y() == 264:  # A4 pages have a height of 297 mm, minus margins (~10mm top/bottom)
                 pdf.add_page()
                 y = 7  # Reset y to the top of the new page
         # print
@@ -185,15 +185,15 @@ def validate_data():
             exit(1)
         # define output values
         param1 = param1entry.get() # preguntar que fer
-        param2 = "Articulo: " + param2entry.get()
-        param3 = "Talla: " + param3entry.get()
-        param4 = "Cantidad: " + param5entry.get()
+        param2 = "Art " + param2entry.get()
+        param3 = "Talla " + param3entry.get() + "\n"
+        param4 = "Cnt " + param5entry.get()
         #param4 = "Cantidad: " + str(int(int(param4entry.get())/int(param5entry.get())))
         
-        param5 = "***: " + param6entry.get() # preguntar que fer
-        param6 = "Color: " + param7entry.get()
-        param7 = "***: " + param8entry.get() # preguntar que fer
-        param8 = "***: " + param9entry.get() # preguntar que fer
+        param5 = "*** " + param6entry.get() # preguntar que fer
+        param6 = param7entry.get()
+        param7 = "*** " + param8entry.get() # preguntar que fer
+        param8 = "*** " + param9entry.get() # preguntar que fer
         param9 = param5entry.get() # quantitat / grups de
 
         #calculate modulus+quantity value as int
