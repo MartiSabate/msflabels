@@ -80,7 +80,7 @@ def print_data(params, iters):
     params.pop(-1)
     # define PDF
     pdf = FPDF('P', 'mm', 'A4')
-    pdf.set_font('courier', '', 20)
+    pdf.set_font('courier', '', 10)
     pdf.set_auto_page_break(auto=True, margin = 15)
     # add a page
     pdf.add_page()
