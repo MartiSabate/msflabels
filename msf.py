@@ -102,16 +102,47 @@ def determine_position(iteration):
 
 def print_lines(pdf, font_size, params, position, iteration):  
     x, y = position
+    left_padding = 10 # configure left padding in order to center the text
 
     pdf.set_xy(x, y)  # set start position once
 
     for idx, j in enumerate(params):
         pdf.set_x(x)  # multi_cell resets X to margin; force column X each line
+        pdf.set_font('courier', '', font_size)
+        match idx: # switch case alternative
+            case 0 | 3:
+                pdf.set_x(x + left_padding)  # add left padding
+            case 1:
+                pdf.set_font('courier', '', font_size)
+                label = "Art "
+                w = pdf.get_string_width(label) + 2  # +2 is padding (tweak 1–4)
 
-        if idx in (1, 5):  # safer than comparing strings (handles duplicates)
-            pdf.set_font('courier', 'B', font_size)
-        else:
-            pdf.set_font('courier', '', font_size)
+                pdf.cell(w, 7, label, ln=0)
+
+                pdf.set_font('courier', 'B', font_size)
+                pdf.cell(0, 7, str(j), ln=1)
+                continue
+
+            case 2:
+                # Special handling for idx == 2
+                pdf.set_font('courier', 'B', font_size)
+                pdf.set_font('courier', '', font_size)
+                pdf.multi_cell(100, 7, j)
+                pdf.set_x(x) #force first column X
+                pdf.set_font('courier', 'B', font_size)
+                pdf.multi_cell(100, 7, "\t\t\t\t\t\t\t\t\tO\n")
+                continue
+
+            case 5 | 6 | 7:
+                if idx == 5:
+                    # Equivalent to idx == 5
+                    pdf.set_font('courier', 'B', font_size)
+                pdf.set_x(x + left_padding)  # add left padding
+
+            case _:
+                # Equivalent to the else branch
+                pdf.set_font('courier', '', font_size)
+
 
         pdf.multi_cell(100, 7, j)  # no "\n" needed
 
@@ -196,8 +227,8 @@ def validate_data():
             exit(1)
         # define output values
         param1 = param1entry.get() # preguntar que fer
-        param2 = "Art " + param2entry.get()
-        param3 = "Talla " + param3entry.get() + "\n\t\t\t\t\t\t\t\t\tO\n"
+        param2 = param2entry.get()
+        param3 = "Talla " + param3entry.get()
         param4 = "Cnt " + param5entry.get() + "\n\n"
         #param4 = "Cantidad: " + str(int(int(param4entry.get())/int(param5entry.get())))
         
@@ -212,9 +243,9 @@ def validate_data():
         modulus = int(param4entry.get())%int(param5entry.get())
         if modulus != 0:
             if int(param4entry.get()) > int(param5entry.get()):
-                modulusQuantity = "Cantidad: " + str(int(param4entry.get())%int(param5entry.get()))
+                modulusQuantity = "Cnt " + str(int(param4entry.get())%int(param5entry.get()))
             else:                    
-                modulusQuantity = "Cantidad: " + str(int(param4entry.get())%int(param5entry.get())+int(param5entry.get()))
+                modulusQuantity = "Cnt " + str(int(param4entry.get())%int(param5entry.get())+int(param5entry.get()))
         #modulusQuantity = "Cantidad: " + str(int(param4entry.get())%int(param5entry.get())+int(int(param4entry.get())/int(param5entry.get())))
         print("Modulus + quantitat = " + str(modulusQuantity))
         params = [param1, param2, param3, param4, param5, param6, param7, param8, param9, modulusQuantity]
