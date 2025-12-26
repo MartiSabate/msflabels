@@ -2,14 +2,12 @@ import tkinter
 from fpdf import FPDF
 import os
 
-
 # parent window
 window = tkinter.Tk()
 # set window title
 window.title("Etiquetes de producció")
 # set window size 
 #window.geometry("500x500") 
-
 
 # create frame inside the window (hiererchally)
 frame = tkinter.Frame(window)
@@ -43,9 +41,8 @@ param9label.grid(row=7, column=0)
 
 # default tkinter values
 
-rentar = tkinter.StringVar(value="RENTAR")
+#rentar = tkinter.StringVar(value="RENTAR")
 unica = tkinter.StringVar(value="UNICA")
-
 
 # define and print text entry boxes
 
@@ -63,90 +60,104 @@ param6entry = tkinter.Entry(frame1)
 param6entry.grid(row=4, column=1)
 param7entry = tkinter.Entry(frame1)
 param7entry.grid(row=5, column=1)
-param8entry = tkinter.Entry(frame1, textvariable=rentar)
+param8entry = tkinter.Entry(frame1)
 param8entry.grid(row=6, column=1)
 param9entry = tkinter.Entry(frame1)
 param9entry.grid(row=7, column=1)
 
 
+
+# declare position lists globally
+# left column -> x = 10, right column -> x = 110
+# first position -> y = 7, second position -> y = 97, third position y = 187
+pos_left_first = [10, 7]    # left first
+pos_left_second = [10, 97]   # left second
+pos_left_third = [10, 187]  # left third
+pos_right_first = [110, 7]   # right first
+pos_right_second = [110, 97]  # right second
+pos_right_third = [110, 187] # right third
+
 # print button
+
+# function to determine the position
+
+def determine_position(iteration):
+    match positions := iteration % 6:
+        case 0:
+            return pos_left_first
+        case 1:
+            return pos_right_first
+        case 2:
+            return pos_left_second
+        case 3:
+            return pos_right_second
+        case 4:
+            return pos_left_third
+        case 5:
+            return pos_right_third
+        case _:
+            return pos_left_first
+
+#print_lines function definition
+
+def print_lines(pdf, font_size, params, position, iteration):  
+    x, y = position
+
+    pdf.set_xy(x, y)  # set start position once
+
+    for idx, j in enumerate(params):
+        pdf.set_x(x)  # multi_cell resets X to margin; force column X each line
+
+        if idx in (1, 5):  # safer than comparing strings (handles duplicates)
+            pdf.set_font('courier', 'B', font_size)
+        else:
+            pdf.set_font('courier', '', font_size)
+
+        pdf.multi_cell(100, 7, j)  # no "\n" needed
+
+    # separator goes AFTER the loop at the current Y
+    pdf.set_font('courier', '', font_size)
+    pdf.set_x(x)
+    pdf.multi_cell(100, 7, f"{iteration+1}\n__________________")
 
 #print_Data function definition
 
 def print_data(params, iters):
-    #exctact last quantity value
-    lastQuantity = str(params[9])
-    lastOutput = ""
-    params.pop(-1)
-    # define PDF
+    # generate PDF object
     pdf = FPDF('P', 'mm', 'A4')
-    pdf.set_font('courier', '', 10)
-    pdf.set_auto_page_break(auto=True, margin = 15)
-    # add a page
-    pdf.add_page()
-    # add info (100,70) < wide, high
-    # Configuration
-    left_x = 10 # left column
-    right_x = 110  # right column
-    y = 7
-    #retrieve iterations based on input
-    iterations = int(params[8]) #idk what is this
-    params.pop(-1)
-    #generate label output
-    output = ""
-    for values in params: #generate multi_cell value
-        output += values + "\n"
-    
-    #generate last output string if different to 0
-    if lastQuantity != "0":
-        print("last quantity value = " + str(lastQuantity))
-        params[3] = lastQuantity
-        for values in params: #generate multi_cell value
-            lastOutput += values + "\n"
-    #print output on screen
-    #for i in range(iterations):
+    font_size = 15
+    #exctract last quantity value
+    lastQuantity = str(params[9])
+    params.pop(-1) #remove last quantity from params list for now
+    # define PDF atributes (reconfigured during the execution)
+    pdf.set_font('courier', '', font_size) # configure font and size
+    pdf.set_auto_page_break(auto=True, margin = 15) # configure auto page break
+    pdf.add_page() # add a page
+    params.pop(-1) #remove last quantity from params list
+    iters -= 1 #adjust iterations
     for i in range(iters):
         print("i value is: " + str(i))
-        print("range iterations values is: " + str(range(iters)))
-        if i+1 == iters and lastQuantity != "0":
-            output = lastOutput
-        #final output based on the iteration
-        iteration_output = output + str(i+1) + "\n__________________"
-        #cursor add value each iteration
-        cursorAdd = 90
-        if (i % 2) == 0:
-            if i != 0:
-                y += cursorAdd # adjust cursor y as corresponding per its iteration
-                if i % 6 == 0:
-                    y -= cursorAdd
-                print(pdf.get_y())            
-                # Left column
-                pdf.set_xy(left_x, y)
-                pdf.multi_cell(100, 7, iteration_output)
-            else:
-                print(pdf.get_y())            
-                # Left column
-                pdf.set_xy(left_x, y)
-                pdf.multi_cell(100, 7, iteration_output)
-        else:
-            # Right column
-            pdf.set_xy(right_x, y)
-            pdf.multi_cell(100, 7, iteration_output)
-            if pdf.get_y() == 271:  # A4 pages have a height of 297 mm, minus margins (~10mm top/bottom)
-                pdf.add_page()
-                y = 7  # Reset y to the top of the new page
-        # print
-        #pdf.multi_cell(100, 7, iteration_output)
-        # Check if y is getting close to the bottom of the page
+        #determine position
+        pos = determine_position(i)
+        print("position selected is: " + str(pos))
+        print_lines(pdf, font_size, params, pos, i)
+        #after 6 labels, add a new page
+        if (i+1)%6 == 0 and i != 0:
+            print("new page added")
+            pdf.add_page()
+    #after all iterations, print last output if required
+    if lastQuantity != "0":
+        params[3] = lastQuantity #restore last quantity value
+        print("printing last output")
+        #determine position
+        pos = determine_position(iters)
+        print("position selected is: " + str(pos))
+        print_lines(pdf, font_size, params, pos, iters)
     
-
-    # retrieve temporal os path
-    tmp_path = os.path.expandvars(r"%TMP%\pdf_1.pdf")
-    #save pdf
-    pdf.output(tmp_path)
-    # print pdf
-    #os.startfile(tmp_path, "print")
-    os.startfile(tmp_path)
+    tmp_path = os.path.expandvars(r"%TMP%\pdf_1.pdf") # retrieve temporal os path
+    
+    pdf.output(tmp_path) #save pdf to temporal path over the last one if exists
+    os.startfile(tmp_path) # print pdf
     print("done")
 
 #validate_data function definition
@@ -186,14 +197,14 @@ def validate_data():
         # define output values
         param1 = param1entry.get() # preguntar que fer
         param2 = "Art " + param2entry.get()
-        param3 = "Talla " + param3entry.get() + "\n\n"
-        param4 = "Cnt " + param5entry.get()
+        param3 = "Talla " + param3entry.get() + "\n\t\t\t\t\t\t\t\t\tO\n"
+        param4 = "Cnt " + param5entry.get() + "\n\n"
         #param4 = "Cantidad: " + str(int(int(param4entry.get())/int(param5entry.get())))
         
-        param5 = "*** " + param6entry.get() # preguntar que fer
+        param5 = param6entry.get() # preguntar que fer
         param6 = param7entry.get()
-        param7 = "*** " + param8entry.get() # preguntar que fer
-        param8 = "*** " + param9entry.get() # preguntar que fer
+        param7 = param8entry.get() # preguntar que fer
+        param8 = param9entry.get() # preguntar que fer
         param9 = param5entry.get() # quantitat / grups de
 
         #calculate modulus+quantity value as int
@@ -209,7 +220,7 @@ def validate_data():
         params = [param1, param2, param3, param4, param5, param6, param7, param8, param9, modulusQuantity]
         print("Input validatin ok, printing")
 
-        # calculate iterations
+        # calculate iterations per quantity (see above param 9)
         iterations = int(int(param4entry.get())/int(param5entry.get()))
         if (int(param4entry.get())%int(param5entry.get())) != 0:
             print("sum 1 to iterations")
