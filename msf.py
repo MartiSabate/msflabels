@@ -39,31 +39,74 @@ param8label.grid(row=6, column=0)
 param9label = tkinter.Label(frame1, text="**")
 param9label.grid(row=7, column=0)
 
-# default tkinter values
+# default tkinter values declaration
+
+## configure test mode
+
+TEST_RUN = False
+#TEST_RUN = False
 
 #rentar = tkinter.StringVar(value="RENTAR")
 unica = tkinter.StringVar(value="UNICA")
 
-# define and print text entry boxes
+if TEST_RUN:
 
-param1entry = tkinter.Entry(frame1)
-param1entry.grid(row=0, column=1)
-param2entry = tkinter.Entry(frame1)
-param2entry.grid(row=1, column=1)
-param3entry = tkinter.Entry(frame1, textvariable=unica)
-param3entry.grid(row=2, column=1)
-param4entry = tkinter.Entry(frame1)
-param4entry.grid(row=3, column=1)
-param5entry = tkinter.Entry(frame1)
-param5entry.grid(row=3, column=3)
-param6entry = tkinter.Entry(frame1)
-param6entry.grid(row=4, column=1)
-param7entry = tkinter.Entry(frame1)
-param7entry.grid(row=5, column=1)
-param8entry = tkinter.Entry(frame1)
-param8entry.grid(row=6, column=1)
-param9entry = tkinter.Entry(frame1)
-param9entry.grid(row=7, column=1)
+    print("Running in TEST MODE")
+    ## test values declaration
+    test_value1 = tkinter.StringVar(value="NEPAL")
+    test_value2 = tkinter.StringVar(value="5454/6")
+    test_value3 = unica
+    test_value4_odd = tkinter.IntVar(value=1213)
+    test_value4_even = tkinter.IntVar(value=12)
+    test_value5_odd = tkinter.IntVar(value=31)
+    test_value5_even = tkinter.IntVar(value=12)
+    test_value6 = tkinter.StringVar(value="PARAM1")
+    test_value7 = tkinter.StringVar(value="331-NEGRE")
+    test_value8 = tkinter.StringVar(value="RENTAT")
+    test_value9 = tkinter.StringVar(value="PLANXAT")
+
+    param1entry = tkinter.Entry(frame1, textvariable=test_value1)
+    param1entry.grid(row=0, column=1)
+    param2entry = tkinter.Entry(frame1, textvariable=test_value2)
+    param2entry.grid(row=1, column=1)
+    param3entry = tkinter.Entry(frame1, textvariable=test_value3)
+    param3entry.grid(row=2, column=1)
+    param4entry = tkinter.Entry(frame1, textvariable=test_value4_even)
+    param4entry.grid(row=3, column=1)
+    param5entry = tkinter.Entry(frame1, textvariable=test_value5_even)
+    param5entry.grid(row=3, column=3)
+    param6entry = tkinter.Entry(frame1, textvariable=test_value6)
+    param6entry.grid(row=4, column=1)
+    param7entry = tkinter.Entry(frame1, textvariable=test_value7)
+    param7entry.grid(row=5, column=1)
+    param8entry = tkinter.Entry(frame1, textvariable=test_value8)
+    param8entry.grid(row=6, column=1)
+    param9entry = tkinter.Entry(frame1, textvariable=test_value9)
+    param9entry.grid(row=7, column=1)
+
+else:
+    
+    print("Running in PROD mode")
+    # define and print text entry boxes for prod
+
+    param1entry = tkinter.Entry(frame1)
+    param1entry.grid(row=0, column=1)
+    param2entry = tkinter.Entry(frame1)
+    param2entry.grid(row=1, column=1)
+    param3entry = tkinter.Entry(frame1, textvariable=unica)
+    param3entry.grid(row=2, column=1)
+    param4entry = tkinter.Entry(frame1)
+    param4entry.grid(row=3, column=1)
+    param5entry = tkinter.Entry(frame1)
+    param5entry.grid(row=3, column=3)
+    param6entry = tkinter.Entry(frame1)
+    param6entry.grid(row=4, column=1)
+    param7entry = tkinter.Entry(frame1)
+    param7entry.grid(row=5, column=1)
+    param8entry = tkinter.Entry(frame1)
+    param8entry.grid(row=6, column=1)
+    param9entry = tkinter.Entry(frame1)
+    param9entry.grid(row=7, column=1)
 
 
 
@@ -77,7 +120,14 @@ pos_right_first = [110, 7]   # right first
 pos_right_second = [110, 97]  # right second
 pos_right_third = [110, 187] # right third
 
-# print button
+# function to print the O
+def print_o(pdf, font_size):
+    pdf.set_font('courier', 'B', font_size)
+    pdf.multi_cell(100, 7, "\t\t\t\t\t\t\t\t\tO\n")
+
+# function to print a blank line
+def print_blank_line(pdf):
+    pdf.multi_cell(100, 7, "")
 
 # function to determine the position
 
@@ -107,35 +157,37 @@ def print_lines(pdf, font_size, params, position, iteration):
     pdf.set_xy(x, y)  # set start position once
 
     for idx, j in enumerate(params):
-        pdf.set_x(x)  # multi_cell resets X to margin; force column X each line
+        if idx == 3 or idx == 5 or idx == 6 or idx == 7: # add padding to the position
+            pdf.set_x(x+left_padding)
+        else:
+            pdf.set_x(x)  # multi_cell resets X to margin; force column X each line
         pdf.set_font('courier', '', font_size)
+        # 0 = NEPAL
+        # 1 = ARTICLE
+        # 2 = TALLA
+        # 3 = CNT
+        # 4 = PARAM1
+        # 5 = COLOR
+        # 6 = RENTAT
+        # 7 = PLANXAT
         match idx: # switch case alternative
-            case 0 | 3:
-                pdf.set_x(x + left_padding)  # add left padding
             case 1:
                 pdf.set_font('courier', '', font_size)
                 label = "Art "
                 w = pdf.get_string_width(label) + 2  # +2 is padding (tweak 1–4)
-
-                pdf.cell(w, 7, label, ln=0)
+                pdf.cell(w, 7, label, ln=0) # print on pdf without jump line
 
                 pdf.set_font('courier', 'B', font_size)
-                pdf.cell(0, 7, str(j), ln=1)
+                pdf.cell(0, 7, str(j), ln=1) #print on the same line
                 continue
-
-            case 2:
-                # Special handling for idx == 2
-                pdf.set_font('courier', 'B', font_size)
-                pdf.set_font('courier', '', font_size)
-                pdf.multi_cell(100, 7, j)
-                pdf.set_x(x) #force first column X
-                pdf.set_font('courier', 'B', font_size)
-                pdf.multi_cell(100, 7, "\t\t\t\t\t\t\t\t\tO\n")
+            
+            case 2: #print the content and a blank line
+                pdf.multi_cell(100, 7, j)  # no "\n" needed
+                pdf.set_x(x)
+                print_blank_line(pdf)
                 continue
-
             case 5 | 6 | 7:
                 if idx == 5:
-                    # Equivalent to idx == 5
                     pdf.set_font('courier', 'B', font_size)
                 pdf.set_x(x + left_padding)  # add left padding
 
@@ -143,8 +195,10 @@ def print_lines(pdf, font_size, params, position, iteration):
                 # Equivalent to the else branch
                 pdf.set_font('courier', '', font_size)
 
-
         pdf.multi_cell(100, 7, j)  # no "\n" needed
+        if idx == 3: #print O after the indicated position idx
+            pdf.set_x(x)
+            print_o(pdf, font_size)
 
     # separator goes AFTER the loop at the current Y
     pdf.set_font('courier', '', font_size)
@@ -229,7 +283,7 @@ def validate_data():
         param1 = param1entry.get() # preguntar que fer
         param2 = param2entry.get()
         param3 = "Talla " + param3entry.get()
-        param4 = "Cnt " + param5entry.get() + "\n\n"
+        param4 = "Cnt " + param5entry.get()
         #param4 = "Cantidad: " + str(int(int(param4entry.get())/int(param5entry.get())))
         
         param5 = param6entry.get() # preguntar que fer
@@ -257,6 +311,9 @@ def validate_data():
             print("sum 1 to iterations")
             iterations += 1
             print("iterations: " + str(iterations))
+        else:
+            print("sum 1 to iterations ")
+            iterations += 1
 
         #after validation successfull print data
         print_data(params, iterations)
